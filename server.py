@@ -1,18 +1,19 @@
 # server.py
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 
 from validador_verificamex import validar_ine, validar_curp
 
-app = Flask(__name__, static_folder=".")
+app = Flask(__name__)
 CORS(app)
 
 # ── Sirve el frontend ─────────────────────────────────────────────────────────
 
-@app.route("/")
+@app.route('/')
 def index():
-    return send_from_directory(".", "index.html")
+    # Esto le dice a Flask que busque "index.html" dentro de la carpeta "templates"
+    return render_template('index.html')
 
 
 # ── Endpoint: Validar INE ─────────────────────────────────────────────────────
