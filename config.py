@@ -6,9 +6,11 @@ ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiYTE
 # Pega aquí el endpoint real que te dé Verificamex.
 # Ejemplo ficticio:
 # API_URL = "https://api.verificamex.com/identity/v1/ine"
-API_URL_INE  = "https://api.verificamex.com/identity/v1/validations/basic"
+API_URL_INE  = "https://api.verificamex.com/identity/v1/validations/basic" # =================== PRODUCCION 
+# API_URL_INE  = "http://localhost:8080/identity/v1/validations/basic"
 
-API_URL_CURP = "https://api.verificamex.com/identity/v1/scraping/renapo"
+API_URL_CURP = "https://api.verificamex.com/identity/v1/scraping/renapo" # ====================== PRODUCCION
+# API_URL_CURP = "http://localhost:8080/identity/v1/scraping/renapo"
 
 # Tiempo máximo de espera para la respuesta de la API
 TIMEOUT = 120
