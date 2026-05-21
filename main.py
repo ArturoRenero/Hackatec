@@ -1,52 +1,61 @@
 # main.py
-
-from validador_verificamex import validar_ine_curp, imprimir_json
+from validador_verificamex import validar_ine, validar_curp, imprimir_json  # ← corregido
 
 
 def main():
     print("====================================")
-    print("VALIDADOR DE INE + CURP")
-    print("Usando API de Verificamex")
+    print("  VALIDADOR DE INE + CURP")
+    print("  Usando API de Verificamex")
     print("====================================")
 
-    ruta_frente = input("Ruta de la imagen frontal de la INE: ")
-    ruta_reverso = input("Ruta de la imagen trasera de la INE: ")
+    modo = input("\n¿Qué deseas validar? [1] INE  [2] CURP  [3] Ambos: ").strip()
 
-    try:
-        resultado = validar_ine_curp(ruta_frente, ruta_reverso)
+    if modo in ("1", "3"):
+        print("\n--- Validación de INE ---")
+        ruta_frente  = input("Ruta de la imagen frontal de la INE: ").strip()
+        ruta_reverso = input("Ruta de la imagen trasera de la INE: ").strip()
 
-        print("\n========== RESULTADO RESUMIDO ==========")
+        try:
+            resultado = validar_ine(ruta_frente, ruta_reverso)
+            if resultado.get("error"):
+                print("\n❌ Error al validar INE.")
+                print("Código:", resultado["status_code"])
+                print("Detalle:", resultado["detalle"])
+            else:
+                interp = resultado["interpretacion"]
+                print("\n✅ INE procesada.")
+                print("Válida en lista nominal:", interp["lista_nominal"])
+                print("Mensaje:", interp["mensaje"])
+                print("\n--- Datos extraídos ---")
+                imprimir_json(interp["datos_extraidos"])
+        except (FileNotFoundError, ValueError) as e:
+            print("Error:", e)
+        except requests.exceptions.ReadTimeout:
+            print("\n⏱ Timeout: el servidor tardó demasiado. Intenta de nuevo en unos segundos.")
 
-        if resultado.get("error"):
-            print("Error al validar.")
-            print("Código:", resultado.get("status_code"))
-            print("Mensaje:", resultado.get("mensaje"))
-            print("Detalle:", resultado.get("detalle"))
-            return
+    if modo in ("2", "3"):
+        print("\n--- Validación de CURP ---")
+        curp = input("Ingresa la CURP a validar: ").strip().upper()
 
-        interpretacion = resultado["interpretacion"]
-
-        print("Validación general:", interpretacion["valida_general"])
-        print("INE válida:", interpretacion["ine_valida"])
-        print("CURP válida:", interpretacion["curp_valida"])
-        print("OCR correcto:", interpretacion["ocr_correcto"])
-        print("Mensaje:", interpretacion["mensaje"])
-
-        print("\n========== DATOS EXTRAÍDOS ==========")
-        imprimir_json(interpretacion["datos_extraidos"])
-
-        print("\n========== RESPUESTA ORIGINAL DE LA API ==========")
-        imprimir_json(resultado["respuesta_original"])
-
-    except FileNotFoundError as e:
-        print("Error de archivo:", e)
-
-    except ValueError as e:
-        print("Error de configuración:", e)
-
-    except Exception as e:
-        print("Error inesperado:", e)
+        try:
+            resultado = validar_curp(curp)
+            if resultado.get("error"):
+                print("\n❌ Error al validar CURP.")
+                print("Código:", resultado["status_code"])
+                print("Detalle:", resultado["detalle"])
+            else:
+                interp = resultado["interpretacion"]
+                print("\n✅ CURP consultada ante RENAPO.")
+                print("Válida:", interp["valida"])
+                print("Nombre:", interp["nombre"])
+                print("Sexo:", interp["sexo"])
+                print("Fecha de nacimiento:", interp["fecha_nacimiento"])
+                print("Entidad:", interp["entidad"])
+                print("Status CURP:", interp["status_curp"])
+        except Exception as e:
+            print("Error inesperado:", e)
 
 
 if __name__ == "__main__":
+    import requests  # para capturar ReadTimeout arriba
     main()
